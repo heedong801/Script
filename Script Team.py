@@ -12,6 +12,8 @@ SearchTextBox1 = None
 SearchTextBox2 = None
 RememberAreaCode = -1
 RememberContentCode = -1
+RememberSubAreaCode = -1
+
 def InitHeadLine():
     HeadLineFont = font.Font(window, size=20, weight='bold')
     HeadLine = Label(window, font = HeadLineFont, text="국문 관광정보 서비스 App")
@@ -57,7 +59,7 @@ def InitSearchText():
 def SearchButtonAction1():
     import http.client
     from xml.dom.minidom import parse, parseString
-    global SearchListBox2, SearchString, SearchTextBox1, RememberAreaCode, RememberContentCode
+    global SearchListBox1, SearchString, SearchTextBox1, RememberAreaCode, RememberContentCode, RememberSubAreaCode
 
     SearchTextBox1.configure(state='normal')
     SearchTextBox1.delete(0.0, END)
@@ -120,7 +122,86 @@ def SearchButtonAction1():
                 SearchTextBox1.insert(INSERT, '\n')
 
 def SearchButtonAction2():
-    pass
+    import http.client
+    from xml.dom.minidom import parse, parseString
+    global SearchListBox2, SearchString, SearchTextBox2, RememberAreaCode, RememberContentCode, RememberSubAreaCode
+
+    SearchTextBox2.configure(state='normal')
+    SearchTextBox2.delete(0.0, END)
+
+    if SearchListBox2.curselection()[0] == 0:
+        RememberContentCode = 12
+    elif SearchListBox2.curselection()[0] == 1:
+        RememberContentCode = 14
+    elif SearchListBox2.curselection()[0] == 2:
+        RememberContentCode = 15
+    elif SearchListBox2.curselection()[0] == 3:
+        RememberContentCode = 25
+    elif SearchListBox2.curselection()[0] == 4:
+        RememberContentCode = 28
+    elif SearchListBox2.curselection()[0] == 5:
+        RememberContentCode = 32
+    elif SearchListBox2.curselection()[0] == 6:
+        RememberContentCode = 38
+    elif SearchListBox2.curselection()[0] == 7:
+        RememberContentCode = 39
+
+    conn = http.client.HTTPConnection("api.visitkorea.or.kr")
+    conn.request("GET",
+                 "/openapi/service/rest/KorService/areaBasedList?serviceKey=uAZ4kkFChL5d%2FLnSAxDGp6wkFCgE%2BovQ6W%2FC8gk5%2FA2%2BxhIRSXALj%2FV3SppGEippCgUluNCQ9mT9XdkQXbO1jg%3D%3D&pageNo=1&startPage=1&numOfRows=100&pageSize=100&MobileApp=AppTest&MobileOS=ETC&arrange=A&contentTypeId=" + str(
+                     RememberContentCode) + "&areaCode=" + RememberAreaCode + "&sigunguCode=" + str(
+                     RememberSubAreaCode) + "&listYN=Y")
+    req = conn.getresponse()
+
+    if req.status == 200:
+        BooksDoc = req.read().decode('utf-8')
+        if BooksDoc == None:
+            print("에러")
+        else:
+            parseData = parseString(BooksDoc)
+            GeoInfoLibrary = parseData.childNodes
+            AreaData = GeoInfoLibrary[0].childNodes[1].childNodes[0].childNodes
+            cnt = 0
+            for item in AreaData:
+                cnt += 1
+                nTitle = 0
+                nTel = 0
+                nAddr2 = 0
+                lengthofChildNodes = len(item.childNodes)
+                while nTitle < lengthofChildNodes:
+                    if item.childNodes[nTitle].nodeName == 'title':
+                        break
+                    nTitle += 1
+                while nTel < lengthofChildNodes:
+                    if item.childNodes[nTel].nodeName == 'tel':
+                        break
+                    nTel += 1
+                while nAddr2 < lengthofChildNodes:
+                    if item.childNodes[nAddr2].nodeName == 'addr2':
+                        break
+                    nAddr2 += 1
+                SearchTextBox2.insert(INSERT, "[")
+                SearchTextBox2.insert(INSERT, cnt)
+                SearchTextBox2.insert(INSERT, "] ")
+                SearchTextBox2.insert(INSERT, '명칭 : ')
+                SearchTextBox2.insert(INSERT, item.childNodes[nTitle].childNodes[0].nodeValue)  # 이름
+                SearchTextBox2.insert(INSERT, '\n')
+                SearchTextBox2.insert(INSERT, '주소 : ')
+                SearchTextBox2.insert(INSERT, item.childNodes[0].childNodes[0].nodeValue)  # 주소1
+                SearchTextBox2.insert(INSERT, '\n')
+                SearchTextBox2.insert(INSERT, '상세 : ')
+                if nAddr2 < lengthofChildNodes:
+                    SearchTextBox2.insert(INSERT, item.childNodes[nAddr2].childNodes[0].nodeValue)  # 주소2
+                else:
+                    SearchTextBox2.insert(INSERT, '-')
+                SearchTextBox2.insert(INSERT, '\n')
+                SearchTextBox2.insert(INSERT, '전화번호 : ')
+                if nTel < lengthofChildNodes:
+                    SearchTextBox2.insert(INSERT, item.childNodes[nTel].childNodes[0].nodeValue)  # 전화번호
+                else:
+                    SearchTextBox2.insert(INSERT, '-')
+                SearchTextBox2.insert(INSERT, '\n')
+                SearchTextBox2.insert(INSERT, '\n')
 
 def SearchButtonAction():
     global SearchEntry, SearchString, RememberAreaCode, SearchListBox2, RememberContentCode
