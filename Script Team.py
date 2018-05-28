@@ -12,7 +12,6 @@ SearchTextBox1 = None
 SearchTextBox2 = None
 RememberAreaCode = -1
 RememberContentCode = -1
-
 def InitHeadLine():
     HeadLineFont = font.Font(window, size=20, weight='bold')
     HeadLine = Label(window, font = HeadLineFont, text="국문 관광정보 서비스 App")
@@ -58,7 +57,10 @@ def InitSearchText():
 def SearchButtonAction1():
     import http.client
     from xml.dom.minidom import parse, parseString
-    global SearchString, SearchTextBox1, SearchTextBox1, RememberAreaCode, RememberContentCode
+    global SearchListBox2, SearchString, SearchTextBox1, RememberAreaCode, RememberContentCode
+
+    SearchTextBox1.configure(state='normal')
+    SearchTextBox1.delete(0.0, END)
 
     RememberSubAreaCode = SearchListBox1.curselection()[0] + 1
 
@@ -75,15 +77,53 @@ def SearchButtonAction1():
             parseData = parseString(BooksDoc)
             GeoInfoLibrary = parseData.childNodes
             AreaData = GeoInfoLibrary[0].childNodes[1].childNodes[0].childNodes
-
+            cnt = 0
             for item in AreaData:
-                pass
+                cnt += 1
+                nTitle = 0
+                nTel = 0
+                nAddr2 = 0
+                lengthofChildNodes = len(item.childNodes)
+                while nTitle < lengthofChildNodes:
+                    if item.childNodes[nTitle].nodeName == 'title':
+                        break
+                    nTitle += 1
+                while nTel < lengthofChildNodes:
+                    if item.childNodes[nTel].nodeName == 'tel':
+                        break
+                    nTel += 1
+                while nAddr2 < lengthofChildNodes:
+                    if item.childNodes[nAddr2].nodeName == 'addr2':
+                        break
+                    nAddr2 += 1
+                SearchTextBox1.insert(INSERT, "[")
+                SearchTextBox1.insert(INSERT, cnt)
+                SearchTextBox1.insert(INSERT, "] ")
+                SearchTextBox1.insert(INSERT, '명칭 : ')
+                SearchTextBox1.insert(INSERT, item.childNodes[nTitle].childNodes[0].nodeValue) #이름
+                SearchTextBox1.insert(INSERT, '\n')
+                SearchTextBox1.insert(INSERT, '주소 : ')
+                SearchTextBox1.insert(INSERT, item.childNodes[0].childNodes[0].nodeValue) #주소1
+                SearchTextBox1.insert(INSERT, '\n')
+                SearchTextBox1.insert(INSERT, '상세 : ')
+                if nAddr2 < lengthofChildNodes :
+                    SearchTextBox1.insert(INSERT, item.childNodes[nAddr2].childNodes[0].nodeValue) #주소2
+                else:
+                    SearchTextBox1.insert(INSERT, '-')
+                SearchTextBox1.insert(INSERT, '\n')
+                SearchTextBox1.insert(INSERT, '전화번호 : ')
+                if nTel < lengthofChildNodes :
+                    SearchTextBox1.insert(INSERT, item.childNodes[nTel].childNodes[0].nodeValue) #전화번호
+                else :
+                    SearchTextBox1.insert(INSERT, '-')
+                SearchTextBox1.insert(INSERT, '\n')
+                SearchTextBox1.insert(INSERT, '\n')
 
 def SearchButtonAction2():
     pass
 
 def SearchButtonAction():
-    global SearchEntry, SearchString, RememberAreaCode, SearchTextBox2, RememberContentCode
+    global SearchEntry, SearchString, RememberAreaCode, SearchListBox2, RememberContentCode
     import http.client
     from xml.dom.minidom import parse, parseString
     SearchString = SearchEntry.get()
@@ -185,7 +225,6 @@ def SetSearchListBox():
 
     ListBoxScrollbar = Scrollbar(window)
     ListBoxScrollbar.place(x=395, y=62)
-
 
     TempFont = font.Font(window, size=15, weight='bold', family='Consolas')
     SearchListBox1 = Listbox(window, font=TempFont, activestyle='none',
