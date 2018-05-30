@@ -388,6 +388,6 @@ InitHeadLine()
 InitSearchEntry()
 InitSearchButton()
 InitSearchListBox()
-InitSearchText() 
+InitSearchText()
 
 window.mainloop()
