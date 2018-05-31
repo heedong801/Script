@@ -384,10 +384,11 @@ def SetSearchListBox():
     SearchListBox1.grid(row = 2,column = 0)
     ListBoxScrollbar.config(command=SearchListBox1.yview)
 
-InitHeadLine()
+InitHeadLine()      
 InitSearchEntry()
 InitSearchButton()
 InitSearchListBox()
 InitSearchText()
 
 window.mainloop()
+
