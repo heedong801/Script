@@ -36,10 +36,10 @@ def InitHeadLine():
     HeadLine.grid(row = 0, column = 0)
 
 def InitLabels():
-    l1 = Label(window, text="지역")
-    l2 = Label(window, text="시군구")
-    l1.pack()
-    l2.pack()
+    l1 = Label(window, text="상위지역")
+    l2 = Label(window, text="하위지역")
+    l1.place(x = 125, y = 40)
+    l2.place(x = 125, y = 75)
 
 def InitSearchEntry():
     global SearchEntry
@@ -385,6 +385,7 @@ def SetSearchListBox():
     ListBoxScrollbar.config(command=SearchListBox1.yview)
 
 InitHeadLine()
+InitLabels()
 InitSearchEntry()
 InitSearchButton()
 InitSearchListBox()
