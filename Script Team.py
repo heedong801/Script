@@ -388,7 +388,7 @@ InitHeadLine()
 InitLabels()
 InitSearchEntry()
 InitSearchButton()
-InitSearchListBox()
+#InitSearchListBox()
 InitSearchText()
 
 window.mainloop()
