@@ -2,16 +2,22 @@ from tkinter import *
 from tkinter import font
 import tkinter.messagebox
 import folium
+from email.mime.text import MIMEText
 
 window = Tk()
+window.title("국문관광정보 프로그램 by 희동민")
+window.geometry('1200x600+0+0')
 
 SearchString = ""
-SearchEntry = None
+SearchEntry1 = None
+SearchEntry2 = None
 SearchListBox1 = None
 SearchListBox2 = None
 SearchTextBox1 = None
 SearchTextBox2 = None
 SearchTextBox3 = None
+SearchComboBox = None
+PrintEmailDataString = ""
 
 RememberAreaCode = -1
 RememberContentCode = -1
@@ -38,44 +44,56 @@ def InitHeadLine():
 def InitLabels():
     l1 = Label(window, text="상위지역")
     l2 = Label(window, text="하위지역")
-    l1.place(x = 125, y = 40)
-    l2.place(x = 125, y = 75)
+    l3 = Label(window, text = "E-Mail")
+    l4 = Label(window, text = "Contents Type")
 
+    l1.place(x = 10, y = 40)
+    l2.place(x = 10, y = 75)
+    l3.place(x = 10 , y = 150)
+    l4.place(x = 350, y = 40)
 def InitSearchEntry():
-    global SearchEntry
+    global SearchEntry1, SearchEntry2
 
-    SearchEntry = Entry(window)
-    SearchEntry.grid(row = 1, column = 0)
+    SearchEntry1 = Entry(window)
+    SearchEntry1.place(x = 100, y = 40)
+
+    SearchEntry2 = Entry(window, width = 30)
+    SearchEntry2.place(x = 100, y = 150)
 
 def InitSearchButton():
-    SearchButton = Button(window, text = "검색" ,  command = SearchButtonAction)
-    SearchButton.place(x = 455, y = 35)
+    SearchButton = Button(window, text = "상위지역 + 콘텐츠1" ,  command = SearchButtonAction)
+    SearchButton.place(x = 300, y = 180)
 
-    SearchButton = Button(window, text="검색", command=SearchButtonAction1)
-    SearchButton.grid(row = 4, column = 3)
+    SearchButton = Button(window, text="하위지역 + 텍스트1", command=SearchButtonAction1)
+    SearchButton.place(x = 300, y = 220)
 
-    SearchButton = Button(window, text="검색", command=SearchButtonAction2)
-    SearchButton.grid(row=5, column=3)
+    SearchButton = Button(window, text="콘텐츠2 + 텍스트2", command=SearchButtonAction2)
+    SearchButton.place( x = 450, y = 180)
+
+    SearchButton = Button(window, text="이메일 보내기", command=SearchButtonAction3)
+    SearchButton.place(x = 450, y = 220)
 
 def InitSearchText():
     global SearchTextBox1, SearchTextBox2
 
     SearchTextScrollbar1 = Scrollbar(window)
-    SearchTextScrollbar1.grid(row=4, column=1)
+    SearchTextScrollbar1.place(x = 580 , y = 300)
 
     SearchTextBox1 = Text(window, width=80, height=10, borderwidth=7, relief='ridge', yscrollcommand=SearchTextScrollbar1.set)
-    SearchTextBox1.grid(row = 4, column = 0)
+    SearchTextBox1.place(x = 0 , y = 250)
 
     SearchTextScrollbar2 = Scrollbar(window)
-    SearchTextScrollbar2.grid(row=5, column=1)
+    SearchTextScrollbar2.place(x=580, y=450)
 
     SearchTextBox2 = Text(window, width=80, height=10, borderwidth=7, relief='ridge', yscrollcommand=SearchTextScrollbar2.set)
-    SearchTextBox2.grid(row=5, column = 0 )
+    SearchTextBox2.place(x=0, y=400)
 
 def SearchButtonAction1():
     import http.client
+    import spam
     from xml.dom.minidom import parse, parseString
     global SearchListBox1, SearchString, SearchTextBox1, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle
+    global PrintEmailDataString
 
     SearchTextBox1.configure(state='normal')
     SearchTextBox1.delete(0.0, END)
@@ -105,26 +123,29 @@ def SearchButtonAction1():
                 nMapy = 0
                 lengthofChildNodes = len(item.childNodes)
 
-                while nTitle < lengthofChildNodes:
+                while spam.comparison(nTitle, lengthofChildNodes):
                     if item.childNodes[nTitle].nodeName == 'title':
                         break
                     nTitle += 1
-                while nTel < lengthofChildNodes:
+                while spam.comparison(nTel,lengthofChildNodes):
                     if item.childNodes[nTel].nodeName == 'tel':
                         break
                     nTel += 1
-                while nAddr2 < lengthofChildNodes:
+                while spam.comparison(nAddr2,lengthofChildNodes):
                     if item.childNodes[nAddr2].nodeName == 'addr2':
                         break
                     nAddr2 += 1
-                while nMapx < lengthofChildNodes:
+                while spam.comparison(nMapx,lengthofChildNodes):
                     if item.childNodes[nMapx].nodeName == 'mapx':
                         break
                     nMapx += 1
-                while nMapy < lengthofChildNodes:
+                while spam.comparison(nMapy,lengthofChildNodes):
                     if item.childNodes[nMapy].nodeName == 'mapy':
                         break
                     nMapy += 1
+
+                PrintEmailDataString += "[" + str(cnt) + "]" + "명칭 : " + str(item.childNodes[nTitle].childNodes[0].nodeValue) + "\n"
+                PrintEmailDataString += "주소 : " + item.childNodes[0].childNodes[0].nodeValue + "\n"
 
                 SearchTextBox1.insert(INSERT, "[")
                 SearchTextBox1.insert(INSERT, cnt)
@@ -139,16 +160,21 @@ def SearchButtonAction1():
 
                 if nAddr2 < lengthofChildNodes :
                     SearchTextBox1.insert(INSERT, item.childNodes[nAddr2].childNodes[0].nodeValue) #주소2
+                    PrintEmailDataString += "상세 : " + item.childNodes[nAddr2].childNodes[0].nodeValue + "\n"
                 else:
                     SearchTextBox1.insert(INSERT, '-')
+                    PrintEmailDataString += "상세 : " + "-" + "\n"
 
                 SearchTextBox1.insert(INSERT, '\n')
                 SearchTextBox1.insert(INSERT, '전화번호 : ')
+                PrintEmailDataString += "전화번호 : "
 
                 if nTel < lengthofChildNodes :
                     SearchTextBox1.insert(INSERT, item.childNodes[nTel].childNodes[0].nodeValue) #전화번호
+                    PrintEmailDataString += item.childNodes[nTel].childNodes[0].nodeValue + "\n\n\n"
                 else :
                     SearchTextBox1.insert(INSERT, '-')
+                    PrintEmailDataString += "-" + "\n\n\n"
 
                 SearchTextBox1.insert(INSERT, '\n')
                 SearchTextBox1.insert(INSERT, '\n')
@@ -161,26 +187,25 @@ def SearchButtonAction1():
 def SearchButtonAction2():
     import http.client
     from xml.dom.minidom import parse, parseString
-    global SearchListBox2, SearchString, SearchTextBox2, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle
+    global SearchString, SearchTextBox2, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle
+    global PrintEmailDataString, SearchComboBox
 
-    SearchTextBox2.configure(state='normal')
-    SearchTextBox2.delete(0.0, END)
 
-    if SearchListBox2.curselection()[0] == 0:
+    if SearchComboBox.current() == 0:
         RememberContentCode = 12
-    elif SearchListBox2.curselection()[0] == 1:
+    elif SearchComboBox.current() == 1:
         RememberContentCode = 14
-    elif SearchListBox2.curselection()[0] == 2:
+    elif SearchComboBox.current() == 2:
         RememberContentCode = 15
-    elif SearchListBox2.curselection()[0] == 3:
+    elif SearchComboBox.current() == 3:
         RememberContentCode = 25
-    elif SearchListBox2.curselection()[0] == 4:
+    elif SearchComboBox.current() == 4:
         RememberContentCode = 28
-    elif SearchListBox2.curselection()[0] == 5:
+    elif SearchComboBox.current() == 5:
         RememberContentCode = 32
-    elif SearchListBox2.curselection()[0] == 6:
+    elif SearchComboBox.current() == 6:
         RememberContentCode = 38
-    elif SearchListBox2.curselection()[0] == 7:
+    elif SearchComboBox.current() == 7:
         RememberContentCode = 39
 
     conn = http.client.HTTPConnection("api.visitkorea.or.kr")
@@ -199,6 +224,9 @@ def SearchButtonAction2():
             GeoInfoLibrary = parseData.childNodes
             AreaData = GeoInfoLibrary[0].childNodes[1].childNodes[0].childNodes
             cnt = 0
+
+            PrintEmailDataString += "==============================구분===============================\n\n"
+
             for item in AreaData:
                 cnt += 1
                 nTitle = 0
@@ -242,18 +270,27 @@ def SearchButtonAction2():
                 SearchTextBox2.insert(INSERT, '\n')
                 SearchTextBox2.insert(INSERT, '상세 : ')
 
+                PrintEmailDataString += "[" + str(cnt) + "]" + "명칭 : " + str(
+                    item.childNodes[nTitle].childNodes[0].nodeValue) + "\n"
+                PrintEmailDataString += "주소 : " + item.childNodes[0].childNodes[0].nodeValue + "\n"
+
                 if nAddr2 < lengthofChildNodes:
                     SearchTextBox2.insert(INSERT, item.childNodes[nAddr2].childNodes[0].nodeValue)  # 주소2
+                    PrintEmailDataString += "상세 : " + item.childNodes[nAddr2].childNodes[0].nodeValue + "\n"
                 else:
                     SearchTextBox2.insert(INSERT, '-')
+                    PrintEmailDataString += "상세 : " + "-" + "\n"
 
                 SearchTextBox2.insert(INSERT, '\n')
                 SearchTextBox2.insert(INSERT, '전화번호 : ')
+                PrintEmailDataString += "전화번호 : "
 
                 if nTel < lengthofChildNodes:
                     SearchTextBox2.insert(INSERT, item.childNodes[nTel].childNodes[0].nodeValue)  # 전화번호
+                    PrintEmailDataString += "전화번호 : " + item.childNodes[nTel].childNodes[0].nodeValue + "\n\n\n"
                 else:
                     SearchTextBox2.insert(INSERT, '-')
+                    PrintEmailDataString += "전화번호 : " + "-" + "\n\n\n"
 
                 SearchTextBox2.insert(INSERT, '\n')
                 SearchTextBox2.insert(INSERT, '\n')
@@ -263,36 +300,50 @@ def SearchButtonAction2():
                 RememberMapy = item.childNodes[nMapy].childNodes[0].nodeValue
                 FindinMap()
 
+def SearchButtonAction3():
+    import smtplib
+    from email.mime.text import MIMEText
+
+    smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    smtp.ehlo()  # say Hello
+    smtp.starttls()  # TLS 사용시 필요
+    smtp.login('hidong801@gmail.com', 'tmzmflqxmdjsdj!')
+
+    msg = MIMEText(PrintEmailDataString)
+    msg['Subject'] = '국문관광정보'
+    msg['To'] = 'all_family@naver.com'
+    smtp.sendmail('hidong801@gmail.com', 'all_family@naver.com', msg.as_string())
+
+    smtp.quit()
+
 def SearchButtonAction():
-    global SearchEntry, SearchString, RememberAreaCode, SearchListBox2, RememberContentCode
+    global SearchEntry1, SearchString, RememberAreaCode, RememberContentCode, SearchComboBox
     import http.client
     from xml.dom.minidom import parse, parseString
 
-    SearchString = SearchEntry.get()
+    SearchString = SearchEntry1.get()
 
-    if SearchListBox2.curselection()[0] == 0:
+    if SearchComboBox.current() == 0:
         RememberContentCode = 12
-    elif SearchListBox2.curselection()[0] == 1:
+    elif SearchComboBox.current() == 1:
         RememberContentCode = 14
-    elif SearchListBox2.curselection()[0] == 2:
+    elif SearchComboBox.current() == 2:
         RememberContentCode = 15
-    elif SearchListBox2.curselection()[0] == 3:
+    elif SearchComboBox.current() == 3:
         RememberContentCode = 25
-    elif SearchListBox2.curselection()[0] == 4:
+    elif SearchComboBox.current() == 4:
         RememberContentCode = 28
-    elif SearchListBox2.curselection()[0] == 5:
+    elif SearchComboBox.current() == 5:
         RememberContentCode = 32
-    elif SearchListBox2.curselection()[0] == 6:
+    elif SearchComboBox.current() == 6:
         RememberContentCode = 38
-    elif SearchListBox2.curselection()[0] == 7:
+    elif SearchComboBox.current() == 7:
         RememberContentCode = 39
 
     conn = http.client.HTTPConnection("api.visitkorea.or.kr")
     conn.request("GET",
                  "/openapi/service/rest/KorService/areaCode?serviceKey=uAZ4kkFChL5d%2FLnSAxDGp6wkFCgE%2BovQ6W%2FC8gk5%2FA2%2BxhIRSXALj%2FV3SppGEippCgUluNCQ9mT9XdkQXbO1jg%3D%3D&numOfRows=17&pageSize=17&pageNo=1&startPage=1&MobileOS=ETC&MobileApp=AppTest")
     req = conn.getresponse()
-
-    ListData = []
 
     if req.status == 200:
         BooksDoc = req.read().decode('utf-8')
@@ -314,37 +365,25 @@ def SearchButtonAction():
 def InitSearchListBox():
     global SearchListBox1, SearchListBox2
     ListBoxScrollbar = Scrollbar(window)
-    ListBoxScrollbar.place(x = 395, y = 62)
+    ListBoxScrollbar.place(x = 280, y = 70)
 
     TempFont = font.Font(window, size=15, weight='bold', family='Consolas')
     SearchListBox1 = Listbox(window, font=TempFont, activestyle='none',
                             width=15, height=1, borderwidth=7, relief='ridge',
                             yscrollcommand=ListBoxScrollbar.set)
 
-    SearchListBox1.grid(row = 2,column = 0)
+    SearchListBox1.place( x = 95, y = 75)
     ListBoxScrollbar.config(command=SearchListBox1.yview)
 
-    #---구분선
+def InitComboBox():
+    from tkinter import ttk
+    global SearchComboBox
+    str = StringVar()
 
-    ListBoxScrollbar = Scrollbar(window)
-    ListBoxScrollbar.grid(row=2, column=3)
-
-    TempFont = font.Font(window, size=15, weight='bold', family='Consolas')
-    SearchListBox2 = Listbox(window, font=TempFont, activestyle='none',
-                            width=15, height=1, borderwidth=7, relief='ridge',
-                            yscrollcommand=ListBoxScrollbar.set)
-
-    SearchListBox2.insert(1, "관광지")
-    SearchListBox2.insert(2, "문화시설")
-    SearchListBox2.insert(3, "축제/행사/공연")
-    SearchListBox2.insert(4, "여행코스")
-    SearchListBox2.insert(5, "레포츠")
-    SearchListBox2.insert(6, "숙박")
-    SearchListBox2.insert(7, "쇼핑")
-    SearchListBox2.insert(8, "음식점")
-
-    SearchListBox2.grid(row=2, column=2)
-    ListBoxScrollbar.config(command=SearchListBox2.yview)
+    SearchComboBox = ttk.Combobox(window, width=20, textvariable=str)
+    SearchComboBox['values'] = ('관광지', '문화시설', '축제/행사/공연', '여행코스', '레포츠', '숙박', '쇼핑', '음식점')
+    SearchComboBox.place(x = 450, y = 38)
+    SearchComboBox.current(0)
 
 def SetSearchListBox():
     import http.client
@@ -371,7 +410,7 @@ def SetSearchListBox():
                 ListData.append(subitems.firstChild.nodeValue)
 
     ListBoxScrollbar = Scrollbar(window)
-    ListBoxScrollbar.place(x=395, y=62)
+    ListBoxScrollbar.place(x=280, y=70)
 
     TempFont = font.Font(window, size=15, weight='bold', family='Consolas')
     SearchListBox1 = Listbox(window, font=TempFont, activestyle='none',
@@ -381,15 +420,15 @@ def SetSearchListBox():
     for i in range(len(ListData)):
         SearchListBox1.insert(i, ListData[i])
 
-    SearchListBox1.grid(row = 2,column = 0)
+    SearchListBox1.place(x=95, y=75)
     ListBoxScrollbar.config(command=SearchListBox1.yview)
 
 InitHeadLine()
 InitLabels()
 InitSearchEntry()
+InitComboBox()
 InitSearchButton()
-#InitSearchListBox()
+InitSearchListBox()
 InitSearchText()
 
 window.mainloop()
-
