@@ -9,8 +9,9 @@ window.title("국문관광정보 프로그램 by 희동민")
 window.geometry('1200x600+0+0')
 
 SearchString = ""
-SearchEntry1 = None
-SearchEntry2 = None
+SearchEntry1 = None #상위지역 검색
+SearchEntry2 = None #이메일
+SearchEntry3 = None #키워드(사진) 검색
 SearchListBox1 = None
 SearchListBox2 = None
 SearchTextBox1 = None
@@ -46,19 +47,26 @@ def InitLabels():
     l2 = Label(window, text="하위지역")
     l3 = Label(window, text = "E-Mail")
     l4 = Label(window, text = "Contents Type")
+    l5 = Label(window, text = "사진 검색")
 
     l1.place(x = 10, y = 40)
     l2.place(x = 10, y = 75)
     l3.place(x = 10 , y = 150)
     l4.place(x = 350, y = 40)
+    l5.place(x = 350, y = 75)
+
 def InitSearchEntry():
-    global SearchEntry1, SearchEntry2
+    global SearchEntry1, SearchEntry2, SearchEntry3
 
     SearchEntry1 = Entry(window)
     SearchEntry1.place(x = 100, y = 40)
 
     SearchEntry2 = Entry(window, width = 30)
     SearchEntry2.place(x = 100, y = 150)
+
+    SearchEntry3 = Entry(window, width = 23)
+    SearchEntry3.place(x=450, y=75)
+
 
 def InitSearchButton():
     SearchButton = Button(window, text = "상위지역 + 콘텐츠1" ,  command = SearchButtonAction)
@@ -72,6 +80,9 @@ def InitSearchButton():
 
     SearchButton = Button(window, text="이메일 보내기", command=SearchButtonAction3)
     SearchButton.place(x = 450, y = 220)
+
+    SearchButton = Button(window, text="키워드 검색(사진)", command=SearchButtonAction4)
+    SearchButton.place(x=450, y=140)
 
 def InitSearchText():
     global SearchTextBox1, SearchTextBox2
@@ -316,6 +327,9 @@ def SearchButtonAction3():
 
     smtp.quit()
 
+def SearchButtonAction4(): #사진 
+     pass
+
 def SearchButtonAction():
     global SearchEntry1, SearchString, RememberAreaCode, RememberContentCode, SearchComboBox
     import http.client
@@ -429,6 +443,6 @@ InitSearchEntry()
 InitComboBox()
 InitSearchButton()
 InitSearchListBox()
-InitSearchText()
+#InitSearchText()
 
 window.mainloop()
