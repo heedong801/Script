@@ -12,6 +12,7 @@ SearchString = ""
 SearchEntry1 = None #상위지역 검색
 SearchEntry2 = None #이메일
 SearchEntry3 = None #키워드(사진) 검색
+SearchEntry4 = None #키워드(사진) 검색
 SearchListBox1 = None
 SearchListBox2 = None
 SearchTextBox1 = None
@@ -26,6 +27,102 @@ RememberSubAreaCode = -1
 RememberMapx = -1
 RememberMapy = -1
 RememberTitle = ""
+RememberImageArr1 = []
+RememberImage1 = None
+RememberImageArr2 = []
+RememberImage2 = None
+def NoPic1():
+    from io import BytesIO
+    import urllib
+    import urllib.request
+    from PIL import Image, ImageTk
+
+    # openapi로 이미지 url을 가져옴.
+    url = 'http://www.belimoseoul.com/data/3/44e7b453a54068b6ceab684322cdd5d5.jpg'
+    with urllib.request.urlopen(url) as u:
+        raw_data = u.read()
+
+    im = Image.open(BytesIO(raw_data))
+    image = ImageTk.PhotoImage(im)
+
+    label = Label(window, image=image, height=250, width=500)
+    label.place(x=650, y=20)
+    window.mainloop()
+def NoPic2():
+    from io import BytesIO
+    import urllib
+    import urllib.request
+    from PIL import Image, ImageTk
+
+    # openapi로 이미지 url을 가져옴.
+    url = 'http://www.belimoseoul.com/data/3/44e7b453a54068b6ceab684322cdd5d5.jpg'
+    with urllib.request.urlopen(url) as u:
+        raw_data = u.read()
+
+    im = Image.open(BytesIO(raw_data))
+    image = ImageTk.PhotoImage(im)
+
+    label = Label(window, image=image, height=250, width=500)
+    label.place(x=650, y=290)
+    window.mainloop()
+
+def StickPic1():
+    global RememberImage1
+    from io import BytesIO
+    import urllib
+    import urllib.request
+    from PIL import Image, ImageTk
+
+    # openapi로 이미지 url을 가져옴.
+    url = RememberImage1
+    with urllib.request.urlopen(url) as u:
+        raw_data = u.read()
+
+    im = Image.open(BytesIO(raw_data))
+    image = ImageTk.PhotoImage(im)
+
+    label = Label(window, image=image, height=250, width=500)
+    label.place(x=650, y=20)
+    window.mainloop()
+# #jpg 파일만 가능한데 html이라 지도를 사진으로 보여주는건 불가!
+# def StickMap():
+#     global RememberImage, RememberTitle
+#     from io import BytesIO
+#     import urllib
+#     import urllib.request
+#     from PIL import Image, ImageTk
+#
+#     # openapi로 이미지 url을 가져옴.
+#     url = 'file:///D:/pythonProject/TermProject/' + '강남' + '.html'
+#     with urllib.request.urlopen(url) as u:
+#         raw_data = u.read()
+#
+#     im = Image.open(BytesIO(raw_data))
+#     image = ImageTk.PhotoImage(im)
+#
+#     label = Label(window, image=image, height=300, width=500)
+#     label.place(x=650, y=550)
+#     window.mainloop()
+
+def StickPic2():
+    global RememberImage2
+    from io import BytesIO
+    import urllib
+    import urllib.request
+    from PIL import Image, ImageTk
+
+    # openapi로 이미지 url을 가져옴.
+    url = RememberImage2
+    with urllib.request.urlopen(url) as u:
+        raw_data = u.read()
+
+    im = Image.open(BytesIO(raw_data))
+    image = ImageTk.PhotoImage(im)
+
+    label = Label(window, image=image, height=250, width=500)
+    label.place(x=650, y=290)
+    window.mainloop()
+
 def FindinMap():
     global RememberMapx, RememberMapy, RememberTitle
     RememberMapx = float(RememberMapx)
@@ -35,6 +132,9 @@ def FindinMap():
     # 마커 지정
     folium.Marker([RememberMapy, RememberMapx], popup=RememberTitle).add_to(map_osm)
     # html 파일로 저장
+    for r in RememberTitle:
+        if(r  == '/'):
+            RememberTitle = RememberTitle.replace('/', ' ', 1)
     map_osm.save(RememberTitle + '.html')
 
 def InitHeadLine():
@@ -56,7 +156,7 @@ def InitLabels():
     l5.place(x = 350, y = 75)
 
 def InitSearchEntry():
-    global SearchEntry1, SearchEntry2, SearchEntry3
+    global SearchEntry1, SearchEntry2, SearchEntry3, SearchEntry4
 
     SearchEntry1 = Entry(window)
     SearchEntry1.place(x = 100, y = 40)
@@ -67,6 +167,8 @@ def InitSearchEntry():
     SearchEntry3 = Entry(window, width = 23)
     SearchEntry3.place(x=450, y=75)
 
+    SearchEntry4 = Entry(window, width = 23)
+    SearchEntry4.place(x=450, y=95)
 
 def InitSearchButton():
     SearchButton = Button(window, text = "상위지역 + 콘텐츠1" ,  command = SearchButtonAction)
@@ -81,7 +183,10 @@ def InitSearchButton():
     SearchButton = Button(window, text="이메일 보내기", command=SearchButtonAction3)
     SearchButton.place(x = 450, y = 220)
 
-    SearchButton = Button(window, text="키워드 검색(사진)", command=SearchButtonAction4)
+    SearchButton = Button(window, text="키워드 검색(사진)1", command=SearchButtonAction4)
+    SearchButton.place(x=450, y=110)
+
+    SearchButton = Button(window, text="키워드 검색(사진)2", command=SearchButtonAction5)
     SearchButton.place(x=450, y=140)
 
 def InitSearchText():
@@ -101,9 +206,8 @@ def InitSearchText():
 
 def SearchButtonAction1():
     import http.client
-    import spam
     from xml.dom.minidom import parse, parseString
-    global SearchListBox1, SearchString, SearchTextBox1, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle
+    global SearchListBox1, SearchString, SearchTextBox1, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle, RememberImage1
     global PrintEmailDataString
 
     SearchTextBox1.configure(state='normal')
@@ -132,28 +236,33 @@ def SearchButtonAction1():
                 nAddr2 = 0
                 nMapx = 0
                 nMapy = 0
+                nImage = 0
                 lengthofChildNodes = len(item.childNodes)
 
-                while spam.comparison(nTitle, lengthofChildNodes):
+                while nTitle < lengthofChildNodes:
                     if item.childNodes[nTitle].nodeName == 'title':
                         break
                     nTitle += 1
-                while spam.comparison(nTel,lengthofChildNodes):
+                while nTel < lengthofChildNodes:
                     if item.childNodes[nTel].nodeName == 'tel':
                         break
                     nTel += 1
-                while spam.comparison(nAddr2,lengthofChildNodes):
+                while nAddr2 < lengthofChildNodes:
                     if item.childNodes[nAddr2].nodeName == 'addr2':
                         break
                     nAddr2 += 1
-                while spam.comparison(nMapx,lengthofChildNodes):
+                while nMapx < lengthofChildNodes:
                     if item.childNodes[nMapx].nodeName == 'mapx':
                         break
                     nMapx += 1
-                while spam.comparison(nMapy,lengthofChildNodes):
+                while nMapy < lengthofChildNodes:
                     if item.childNodes[nMapy].nodeName == 'mapy':
                         break
                     nMapy += 1
+                while nImage < lengthofChildNodes:
+                    if item.childNodes[nImage].nodeName == 'firstimage':
+                        break
+                    nImage += 1
 
                 PrintEmailDataString += "[" + str(cnt) + "]" + "명칭 : " + str(item.childNodes[nTitle].childNodes[0].nodeValue) + "\n"
                 PrintEmailDataString += "주소 : " + item.childNodes[0].childNodes[0].nodeValue + "\n"
@@ -190,17 +299,25 @@ def SearchButtonAction1():
                 SearchTextBox1.insert(INSERT, '\n')
                 SearchTextBox1.insert(INSERT, '\n')
                 #지도----------------------------------------
-                RememberTitle = item.childNodes[nTitle].childNodes[0].nodeValue
-                RememberMapx = item.childNodes[nMapx].childNodes[0].nodeValue
-                RememberMapy = item.childNodes[nMapy].childNodes[0].nodeValue
-                FindinMap()
+                if nMapx < lengthofChildNodes - 1:
+                    RememberTitle = item.childNodes[nTitle].childNodes[0].nodeValue
+                    RememberMapx = item.childNodes[nMapx].childNodes[0].nodeValue
+                    RememberMapy = item.childNodes[nMapy].childNodes[0].nodeValue
+                    FindinMap()
+                #사진----------------------------------------
+                if nImage < lengthofChildNodes - 1:
+                    RememberImageArr1.append(item.childNodes[nImage].childNodes[0].nodeValue)
+                else:
+                    RememberImageArr1.append(-1)
 
 def SearchButtonAction2():
     import http.client
     from xml.dom.minidom import parse, parseString
-    global SearchString, SearchTextBox2, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle
+    global SearchString, SearchTextBox2, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle, RememberImage2
     global PrintEmailDataString, SearchComboBox
 
+    SearchTextBox2.configure(state='normal')
+    SearchTextBox2.delete(0.0, END)
 
     if SearchComboBox.current() == 0:
         RememberContentCode = 12
@@ -246,6 +363,7 @@ def SearchButtonAction2():
                 nMapx = 0
                 nMapy = 0
                 lengthofChildNodes = len(item.childNodes)
+                nImage = 0
 
                 while nTitle < lengthofChildNodes:
                     if item.childNodes[nTitle].nodeName == 'title':
@@ -269,6 +387,10 @@ def SearchButtonAction2():
                     if item.childNodes[nMapy].nodeName == 'mapy':
                         break
                     nMapy += 1
+                while nImage < lengthofChildNodes:
+                    if item.childNodes[nImage].nodeName == 'firstimage':
+                        break
+                    nImage += 1
 
                 SearchTextBox2.insert(INSERT, "[")
                 SearchTextBox2.insert(INSERT, cnt)
@@ -310,7 +432,11 @@ def SearchButtonAction2():
                 RememberMapx = item.childNodes[nMapx].childNodes[0].nodeValue
                 RememberMapy = item.childNodes[nMapy].childNodes[0].nodeValue
                 FindinMap()
-
+                #사진----------------------------------------
+                if nImage < lengthofChildNodes - 1:
+                    RememberImageArr2.append(item.childNodes[nImage].childNodes[0].nodeValue)
+                else:
+                    RememberImageArr2.append(-1)
 def SearchButtonAction3():
     import smtplib
     from email.mime.text import MIMEText
@@ -327,8 +453,25 @@ def SearchButtonAction3():
 
     smtp.quit()
 
-def SearchButtonAction4(): #사진 
-     pass
+def SearchButtonAction4(): #사진1
+    global RememberImageArr1, RememberImage1, SearchString, SearchEntry3
+    SearchString = SearchEntry3.get()
+    RememberImage1 = RememberImageArr1[int(SearchString) - 1]
+    if RememberImage1 != -1:
+        StickPic1()
+        # StickMap()
+    else :
+        NoPic1()
+
+def SearchButtonAction5(): #사진2
+    global RememberImageArr2, RememberImage2, SearchString, SearchEntry4
+    SearchString = SearchEntry4.get()
+    RememberImage2 = RememberImageArr2[int(SearchString) - 1]
+    if RememberImage2 != -1:
+        StickPic2()
+        # StickMap()
+    else :
+        NoPic2()
 
 def SearchButtonAction():
     global SearchEntry1, SearchString, RememberAreaCode, RememberContentCode, SearchComboBox
@@ -443,6 +586,6 @@ InitSearchEntry()
 InitComboBox()
 InitSearchButton()
 InitSearchListBox()
-#InitSearchText()
+InitSearchText()
 
 window.mainloop()
