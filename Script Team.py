@@ -443,6 +443,6 @@ InitSearchEntry()
 InitComboBox()
 InitSearchButton()
 InitSearchListBox()
-InitSearchText()
+#InitSearchText()
 
 window.mainloop()
