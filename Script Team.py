@@ -206,6 +206,7 @@ def InitSearchText():
 
 def SearchButtonAction1():
     import http.client
+    import spam
     from xml.dom.minidom import parse, parseString
     global SearchListBox1, SearchString, SearchTextBox1, RememberAreaCode, RememberContentCode, RememberSubAreaCode, RememberMapx, RememberMapy, RememberTitle, RememberImage1
     global PrintEmailDataString
@@ -239,27 +240,27 @@ def SearchButtonAction1():
                 nImage = 0
                 lengthofChildNodes = len(item.childNodes)
 
-                while nTitle < lengthofChildNodes:
+                while spam.comparison(nTitle,lengthofChildNodes):
                     if item.childNodes[nTitle].nodeName == 'title':
                         break
                     nTitle += 1
-                while nTel < lengthofChildNodes:
+                while spam.comparison(nTel,lengthofChildNodes):
                     if item.childNodes[nTel].nodeName == 'tel':
                         break
                     nTel += 1
-                while nAddr2 < lengthofChildNodes:
+                while spam.comparison(nAddr2,lengthofChildNodes):
                     if item.childNodes[nAddr2].nodeName == 'addr2':
                         break
                     nAddr2 += 1
-                while nMapx < lengthofChildNodes:
+                while spam.comparison(nMapx,lengthofChildNodes):
                     if item.childNodes[nMapx].nodeName == 'mapx':
                         break
                     nMapx += 1
-                while nMapy < lengthofChildNodes:
+                while spam.comparison(nMapy,lengthofChildNodes):
                     if item.childNodes[nMapy].nodeName == 'mapy':
                         break
                     nMapy += 1
-                while nImage < lengthofChildNodes:
+                while spam.comparison(nImage,lengthofChildNodes):
                     if item.childNodes[nImage].nodeName == 'firstimage':
                         break
                     nImage += 1
