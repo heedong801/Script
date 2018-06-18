@@ -73,7 +73,7 @@ def handle(msg):
     #     print('try to 확인')
     #     check( chat_id )
     else:
-        noti.sendMessage(chat_id, '모르는 명령어입니다.\n검색 [콘텐츠번호] [상위지역] [하위지역], 저장 [지역번호], 확인 중 하나의 명령을 입력하세요.')
+        noti.sendMessage(chat_id, '검색 [콘텐츠번호] [상위지역] [하위지역] 형식의 명령을 입력하세요.')
 
 
 # today = date.today()

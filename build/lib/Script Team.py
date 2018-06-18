@@ -429,11 +429,10 @@ def SearchButtonAction2():
                 SearchTextBox2.insert(INSERT, '\n')
                 SearchTextBox2.insert(INSERT, '\n')
                 #지도----------------------------------------
-                if nMapx < lengthofChildNodes:
-                    RememberTitle = item.childNodes[nTitle].childNodes[0].nodeValue
-                    RememberMapx = item.childNodes[nMapx].childNodes[0].nodeValue
-                    RememberMapy = item.childNodes[nMapy].childNodes[0].nodeValue
-                    FindinMap()
+                RememberTitle = item.childNodes[nTitle].childNodes[0].nodeValue
+                RememberMapx = item.childNodes[nMapx].childNodes[0].nodeValue
+                RememberMapy = item.childNodes[nMapy].childNodes[0].nodeValue
+                FindinMap()
                 #사진----------------------------------------
                 if nImage < lengthofChildNodes - 1:
                     RememberImageArr2.append(item.childNodes[nImage].childNodes[0].nodeValue)

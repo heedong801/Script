@@ -72,6 +72,10 @@ def getData(RememberContentCode, RememberAreaCode, RememberSubAreaCode):
                     nImage += 1
                 ##############################################
                 row = "[" + str(cnt) +"]" + item.childNodes[0].childNodes[0].nodeValue
+                if nTitle < lengthofChildNodes :
+                    row += " " + item.childNodes[nTitle].childNodes[0].nodeValue
+                else:
+                    row += " " + '-'
                 if nAddr2 < lengthofChildNodes :
                     row += " " + item.childNodes[nAddr2].childNodes[0].nodeValue
                 else:
